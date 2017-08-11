@@ -16,6 +16,8 @@ char* readline(char* prompt) {
   return cpy;
 }
 
+void add_history(char* unused) {}
+
 #else
 #include <editline/readline.h>
 #include <editline/history.h>
@@ -43,10 +45,25 @@ int main(int argc, char** argv) {
 	puts("Press Ctrl+c to Exit\n");
 
 	while(1) {
+
 		char* input = readline("daffy> ");
 		add_history(input);
-		printf("%s\n", input);
+
+		mpc_result_t r;
+		if (mpc_parse("<stdin>", input, Lispy, &r)) {
+			// print the AST if it succeeds
+			mpc_ast_print(r.output);
+			mpc_ast_delete(r.output);
+		} else {
+			// print the error upon failure
+			mpc_err_print(r.error);
+			mpc_err_delete(r.error);
+		}
+
 		free(input);
 	}
+
+	mpc_cleanup(4, Number, Operator, Expr, Lispy);
+
 	return 0;
 }
