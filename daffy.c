@@ -3,19 +3,6 @@
 
 #include "mpc.h"
 
-char* readline(char*);
-void add_history(char*);
-long eval_op(long, char*, long);
-long eval(mpc_ast_t*);
-
-typedef struct mpc_ast_t() {
-	char* tag;
-	char* contents;
-	mpc_state_t state;
-	int children_num;
-	struct mpc_ast_t** children;  
-} mpc_ast_t;
-
 #ifdef _WIN32
 
 static char buffer[2048];
@@ -36,6 +23,38 @@ void add_history(char* unused) {}
 #include <editline/history.h>
 #endif
 
+long eval_op(long x, char* op, long y) {
+	if(strcmp(op, "+") == 0 || strcmp(op, "add") == 0) { return x + y; }
+	if(strcmp(op, "-") == 0 || strcmp(op, "sub") == 0) { return x - y; }
+	if(strcmp(op, "*") == 0 || strcmp(op, "mul") == 0) { return x * y; }
+	if(strcmp(op, "/") == 0 || strcmp(op, "div") == 0) { return x / y; }
+	if(strcmp(op, "%") == 0 || strcmp(op, "mod") == 0) { return x % y; }
+	return 0;
+}
+
+long eval(mpc_ast_t* t) {
+
+	// return directly if number
+	if(strstr(t->tag, "number")) {
+		return atoi(t->contents);
+	}
+
+	// Operator is always second child
+	char* op = t->children[1]->contents;
+
+	// Store the third child in x
+	long x = eval(t->children[2]);
+
+	// Iterate through the remaining children and combining
+	int i = 3;
+	while (strstr(t->children[i]->tag, "expr")) {
+		x = eval_op(x, op, eval(t->children[i]));
+		i++;
+	}
+
+	return x;
+}
+
 int main(int argc, char** argv) {
 
 	/* making the parsers */
@@ -48,7 +67,7 @@ int main(int argc, char** argv) {
 	mpca_lang(MPCA_LANG_DEFAULT,
 	"                                                     \
 	number   : /-?[0-9]+/ ;                             \
-	operator : '+' | '-' | '*' | '/' | '%' | '^' | '.' | \"add\" | \"exp\" | \"mul\" | \"sub\" | \"div\" | \"mod\" ;  \
+	operator : '+' | '-' | '*' | '/' | '%' | '^' |\"add\" | \"exp\" | \"mul\" | \"sub\" | \"div\" | \"mod\" ;  \
 	expr     : <number> | '(' <operator> <expr>+ ')' ;  \
 	lispy    : /^/ <operator> <expr>+ /$/ ;             \
 	",
