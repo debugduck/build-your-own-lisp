@@ -3,17 +3,25 @@
 
 #include "mpc.h"
 
+typedef struct mpc_ast_t() {
+	char* tag;
+	char* contents;
+	mpc_state_t state;
+	int children_num;
+	struct mpc_ast_t** children;  
+} mpc_ast_t;
+
 #ifdef _WIN32
 
 static char buffer[2048];
 
 char* readline(char* prompt) {
-  fputs(prompt, stdout);
-  fgets(buffer, 2048, stdin);
-  char* cpy = malloc(strlen(buffer)+1);
-  strcpy(cpy, buffer);
-  cpy[strlen(cpy)-1] = '\0';
-  return cpy;
+	fputs(prompt, stdout);
+	fgets(buffer, 2048, stdin);
+	char* cpy = malloc(strlen(buffer)+1);
+	strcpy(cpy, buffer);
+	cpy[strlen(cpy)-1] = '\0';
+	return cpy;
 }
 
 void add_history(char* unused) {}
@@ -35,7 +43,7 @@ int main(int argc, char** argv) {
 	mpca_lang(MPCA_LANG_DEFAULT,
 	"                                                     \
 	number   : /-?[0-9]+/ ;                             \
-	operator : '+' | '-' | '*' | '/' | '%' | '^' | \"add\" | \"exp\" | \"mul\" | \"sub\" | \"div\" | \"mod\" ;  \
+	operator : '+' | '-' | '*' | '/' | '%' | '^' | '.' | \"add\" | \"exp\" | \"mul\" | \"sub\" | \"div\" | \"mod\" ;  \
 	expr     : <number> | '(' <operator> <expr>+ ')' ;  \
 	lispy    : /^/ <operator> <expr>+ /$/ ;             \
 	",
