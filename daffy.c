@@ -3,6 +3,11 @@
 
 #include "mpc.h"
 
+char* readline(char*);
+void add_history(char*);
+long eval_op(long, char*, long);
+long eval(mpc_ast_t*);
+
 typedef struct mpc_ast_t() {
 	char* tag;
 	char* contents;
