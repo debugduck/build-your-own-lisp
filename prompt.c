@@ -20,7 +20,6 @@ void add_history(char* unused) {}
 
 #else
 #include <editline/readline.h>
-#include <editline/history.h>
 #endif
 
 long eval_op(long x, char* op, long y) {
@@ -73,19 +72,20 @@ int main(int argc, char** argv) {
 	",
 	Number, Operator, Expr, Lispy);
 
-	puts("Daffy Version 0.0.0.0.1");
+	puts("Lispy Version 0.0.0.0.1");
 	puts("Press Ctrl+c to Exit\n");
 
 	while(1) {
 
-		char* input = readline("daffy> ");
+		char* input = readline("lispy> ");
 		add_history(input);
 
 		mpc_result_t r;
 		if (mpc_parse("<stdin>", input, Lispy, &r)) {
 			// print the AST if it succeeds
-			mpc_ast_print(r.output);
-			mpc_ast_delete(r.output);
+                        long result = eval(r.output);
+                        printf("%li\n", result);
+                        mpc_ast_delete(r.output);
 		} else {
 			// print the error upon failure
 			mpc_err_print(r.error);
