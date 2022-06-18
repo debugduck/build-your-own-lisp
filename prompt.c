@@ -54,6 +54,21 @@ long eval(mpc_ast_t* t) {
 	return x;
 }
 
+int num_leaves(mpc_ast_t* t) {
+	printf("node contents: %s\n\n", t->contents);
+	if (t->children_num == 0) {
+		return 1;
+	}
+	if (t->children_num >= 1) {
+		int total = 0;
+    		for (int i = 0; i < t->children_num; i++) {
+      			total = total + num_leaves(t->children[i]);
+  		}
+		return total;
+	}
+	return 0;
+}
+
 int main(int argc, char** argv) {
 
 	/* making the parsers */
