@@ -28,6 +28,7 @@ long eval_op(long x, char* op, long y) {
 	if(strcmp(op, "*") == 0 || strcmp(op, "mul") == 0) { return x * y; }
 	if(strcmp(op, "/") == 0 || strcmp(op, "div") == 0) { return x / y; }
 	if(strcmp(op, "%") == 0 || strcmp(op, "mod") == 0) { return x % y; }
+	if(strcmp(op, "^") == 0) { return pow(x, y); }
 	return 0;
 }
 
